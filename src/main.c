@@ -6,7 +6,7 @@
 
 // the library is namespaced, name clashing hardly occurs
 #define BUTTON_DEBOUNCE__CONFIRM 64
-#include "button_debounce.c"
+#include "button_debounce.h"
 
 // configure callbacks
 const ButtonDebounce_Config button_c3_debounce_config = {

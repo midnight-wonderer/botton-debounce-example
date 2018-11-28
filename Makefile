@@ -2,20 +2,29 @@ SDCC=sdcc
 SRCDIR=./src
 BINDIR=./bin
 INCLUDES=\
-	./vendor/stm8s/inc \
-	./vendor/button_debounce/inc
-CFLAGS=$(foreach d, $(INCLUDES),-I$d) --nolospre
+./vendor/stm8s/inc\
+./vendor/button_debounce/inc
+CFLAGS=--nolospre $(addprefix -I,$(INCLUDES))
+LDFLAGS=--out-fmt-ihx
+SOURCE_FILES=\
+$(shell find $(SRCDIR) -name "*.c")\
+$(shell find $(INCLUDES) -name "*.c")
+OBJECTS=$(subst /./,/,$(addprefix $(BINDIR)/,$(SOURCE_FILES:.c=.rel)))
 
-.PHONY: all clean
+.PHONY: all build clean
 
-all: main
+all: build
+
+build: $(BINDIR)/program.hex
+
+$(BINDIR)/program.hex: $(OBJECTS)
+	$(SDCC) -mstm8 -lstm8 -o $@ $(LDFLAGS) $^
+
+$(BINDIR)/%.rel: %.c
+	mkdir -p $(dir $@) &&\
+	$(SDCC) -mstm8 -o $@ -c $(CFLAGS) $^
+
+%.c: %.h
 
 clean:
 	rm -rf $(BINDIR)/
-
-main: $(BINDIR)/main.hex
-
-$(BINDIR)/%.hex: $(SRCDIR)/%.c
-	mkdir -p $(BINDIR)/ &&\
-	$(SDCC) -lstm8 -mstm8 -o $(BINDIR)/ --out-fmt-ihx $(CFLAGS) $(LDFLAGS) $< &&\
-	mv $$(echo "$@" | sed -e 's/\.hex$$/\.ihx/g') $@
