@@ -2,11 +2,8 @@
 // under the MIT License https://opensource.org/licenses/MIT
 
 #define STM8S103
-#include "stm8s.h"
-
-// the library is namespaced, name clashing hardly occurs
-#define BUTTON_DEBOUNCE__CONFIRM 64
 #include "button_debounce.h"
+#include "stm8s.h"
 
 // configure callbacks
 const ButtonDebounce_Config button_c3_debounce_config = {

@@ -10,8 +10,8 @@ If you really want to run this project you need the [STM8S development board](ht
 
 ## List of software prerequisites to compile the code
 
-* [Git](https://git-scm.com/)
-* [Small Device C Compiler](http://sdcc.sourceforge.net/)
+* [Git](https://git-scm.com/) version >= 2.0
+* [Small Device C Compiler](http://sdcc.sourceforge.net/) version >= 3.8.3
 * [GNU Make](https://www.gnu.org/software/make/)
 
 ## Build instructions

@@ -1,3 +1,4 @@
+SHELL=/usr/bin/env bash
 SDCC=sdcc
 SDCCLIB=sdcclib
 SRCDIR=./src
@@ -5,10 +6,12 @@ BINDIR=./bin
 INCLUDES=\
 ./vendor/stm8s/inc\
 ./vendor/button_debounce/inc
-CFLAGS=--nolospre $(addprefix -I,$(INCLUDES))
+CFLAGS=--std-c11 --nolospre $(addprefix -I,$(INCLUDES))
 LDFLAGS=--out-fmt-ihx
-APP_SOURCE_FILES=$(shell find $(SRCDIR) -name "*.c")
+ENTRY_SOURCE_FILE=$(shell find $(SRCDIR) -maxdepth 1 -name "main.c")
+APP_SOURCE_FILES=$(filter-out $(ENTRY_SOURCE_FILE), $(shell find $(SRCDIR) -name "*.c"))
 LIB_SOURCE_FILES=$(shell find $(INCLUDES) -name "*.c")
+ENTRY_OBJECT=$(subst /./,/,$(addprefix $(BINDIR)/,$(ENTRY_SOURCE_FILE:.c=.rel)))
 APP_OBJECTS=$(subst /./,/,$(addprefix $(BINDIR)/,$(APP_SOURCE_FILES:.c=.rel)))
 LIB_OBJECTS=$(subst /./,/,$(addprefix $(BINDIR)/,$(LIB_SOURCE_FILES:.c=.rel)))
 
@@ -18,7 +21,7 @@ all: build
 
 build: $(BINDIR)/program.hex
 
-$(BINDIR)/program.hex: $(APP_OBJECTS) $(BINDIR)/vendor.lib
+$(BINDIR)/program.hex: $(ENTRY_OBJECT) $(BINDIR)/vendor.lib $(BINDIR)/app.lib
 	$(SDCC) -mstm8 -lstm8 -o $@ $(LDFLAGS) $^
 
 $(BINDIR)/%.rel: %.c
@@ -26,7 +29,14 @@ $(BINDIR)/%.rel: %.c
 	$(SDCC) -mstm8 -o $@ -c $(CFLAGS) $^
 
 $(BINDIR)/vendor.lib: $(LIB_OBJECTS)
-	$(SDCCLIB) $@ $^
+	[[ ! -z "$^" ]] &&\
+	$(SDCCLIB) $@ $^ ||\
+	touch $@
+
+$(BINDIR)/app.lib: $(APP_OBJECTS)
+	[[ ! -z "$^" ]] &&\
+	$(SDCCLIB) $@ $^ ||\
+	touch $@
 
 %.c: %.h
 
