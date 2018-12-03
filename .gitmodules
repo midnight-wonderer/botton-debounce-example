@@ -3,5 +3,4 @@
 	url = https://github.com/the-cave/button-debounce.git
 [submodule "vendor/stm8s"]
 	path = vendor/stm8s
-	url = https://github.com/midnight-wonderer/stm8-header.git
-	branch = official
+	url = https://github.com/the-cave/stm8s-header.git
